@@ -15,7 +15,12 @@ const streamRouter = require("./router/stream");
 
 const app = new Koa();
 
-app.use(cors());
+app.use(
+    cors({
+        origin: (ctx) => ctx.request.headers.origin,
+        credentials: true,
+    })
+);
 
 const mainRouter = new Router(); // 路由
 mainRouter.get("/", async (ctx) => {
