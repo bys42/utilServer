@@ -8,29 +8,30 @@ module.exports = {
         router.prefix('/vast')
 
         router.get('/:id', async (ctx) => {
-            try {
-                const { id } = ctx.params;
-                const filePath = path.join(__dirname, '../static/vast', `${id}.xml`);
-                const xmlContent = await fs.readFile(filePath, 'utf-8');
-                ctx.type = 'application/xml';
-                ctx.body = xmlContent;
+                try {
+                    const dir = ctx.secure ? "vast_https" : "vast_http";
+                    const { id } = ctx.params;
+                    const filePath = path.join(__dirname, `../static/${dir}/${id}.xml`);
+                    const xmlContent = await fs.readFile(filePath, 'utf-8');
+                    ctx.type = 'application/xml';
+                    ctx.body = xmlContent;
 
-            } catch (error) {
+                } catch (error) {
                 console.error('讀取文件錯誤:', error);
 
                 if (error.code === 'ENOENT') {
-                    ctx.status = 404;
-                    ctx.body = {
+                        ctx.status = 404;
+                        ctx.body = {
                         error: '找不到指定的 VAST 文件'
-                    };
-                    return;
-                }
+                        };
+                        return;
+                    }
 
-                ctx.status = 500;
-                ctx.body = {
+                    ctx.status = 500;
+                    ctx.body = {
                     error: '服務器內部錯誤'
-                };
-            }
+                    };
+                }
         })
 
         return router.routes()
